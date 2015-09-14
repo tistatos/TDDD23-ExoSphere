@@ -1,8 +1,16 @@
 package com.exosphere.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.ModelLoader;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
 /**
  * exosphere - Assets
@@ -10,18 +18,43 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 public class Assets {
 
-    public static Texture mMenuTexture;
-    public static TextureRegion logo;
+    static ModelLoader mModelLoader;
 
-    public static boolean load() {
+    static Texture mMenuTexture;
+    static TextureRegion mLogo;
+    static Model mSatelliteModel;
+    static Model mEarthModel;
 
+
+    public static Model getEarthModel() {
+        return mEarthModel;
+    }
+
+    public static Model getSatelliteModel() {
+        return mSatelliteModel;
+    }
+
+    public static TextureRegion getLogo() {
+        return mLogo;
+    }
+    public static Texture getMenuTexture() {
+        return mMenuTexture;
+    }
+
+    public static void load() {
+        mModelLoader = new ObjLoader();
         mMenuTexture = loadTexture("menu/menuTexture.png");
-        logo = new TextureRegion(mMenuTexture, 0, 0, 252, 73);
-        return true;
+        mLogo = new TextureRegion(mMenuTexture, 0, 0, 252, 73);
+        mSatelliteModel = new ModelBuilder().createBox(0.3f,0.3f,0.3f, new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+
+        mEarthModel = new ModelBuilder().createSphere(10, 10, 10, 32, 32, new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
     }
 
     //TODO: load OBJ-file method
     public static Texture loadTexture (String file) {
         return new Texture(Gdx.files.internal(file));
     }
+    public static Model loadModel (String file) {return mModelLoader.loadModel(Gdx.files.internal(file));}
 }

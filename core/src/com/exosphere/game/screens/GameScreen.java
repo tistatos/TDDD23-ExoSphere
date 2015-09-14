@@ -1,41 +1,36 @@
 package com.exosphere.game.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
+import com.exosphere.game.Exosphere;
 
 /**
  * exosphere - GameScreen
  * game screen during gameplay
  * Created by tistatos on 9/4/15.
  */
-public class GameScreen implements Screen {
-    @Override
-    public void show() {
+public class GameScreen extends ScreenAdapter {
+
+    private Exosphere mGame;
+
+    public GameScreen(Exosphere game) {
+        mGame = game;
+
+
 
     }
 
     @Override
     public void render(float delta) {
+        udpate(delta);
+        draw();
+    }
+
+    private void draw() {
 
     }
 
-    @Override
-    public void resize(int width, int height) {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
+    private void udpate(float delta) {
     }
 
     @Override

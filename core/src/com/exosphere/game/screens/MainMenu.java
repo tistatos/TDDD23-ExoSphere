@@ -15,8 +15,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.exosphere.game.Assets;
+import com.exosphere.game.astroPhysics.SphericalCoord;
 import com.exosphere.game.Exosphere;
-import com.exosphere.game.Settings;
+import com.exosphere.game.gameObjects.Earth;
+import com.exosphere.game.gameObjects.Satellite;
 
 /**
  * exosphere - MainMenu
@@ -31,25 +33,22 @@ public class MainMenu extends ScreenAdapter {
     Rectangle mPlayBounds;
     Rectangle mSettings;
 
-    Model mEarthModel;
-    ModelInstance mEarth;
+    Earth mEarth;
+    Satellite mSattelite;
     Environment environment;
 
 
     public MainMenu(Exosphere game) {
         this.mGame = game;
         mMenuCamera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//        mMenuCamera = new PerspectiveCamera(67, Settings.msScreenSize[0], Settings.msScreenSize[1]);
+//      mMenuCamera = new PerspectiveCamera(67, Settings.msScreenSize[0], Settings.msScreenSize[1]);
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-        //TODO:replace with celestial class
-        mEarthModel = new ModelBuilder().createSphere(10,10,10,32,32,new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-
-        mEarth = new ModelInstance(mEarthModel, 0, 0, 0);
+        mEarth = new Earth();
+        mSattelite = new Satellite(1,1, mEarth);
 
         mMenuCamera.position.set(0f, 0f, 20f);
         mMenuCamera.lookAt(0, 0, 0);
@@ -66,7 +65,7 @@ public class MainMenu extends ScreenAdapter {
         }
 
         mMenuCamera.update();
-        mEarth.transform.rotateRad(Vector3.Y, delta * MathUtils.PI/12);
+        mEarth.getModel().transform.rotateRad(Vector3.Y, delta * MathUtils.PI/12);
     }
 
 
@@ -77,12 +76,13 @@ public class MainMenu extends ScreenAdapter {
         Gdx.gl30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
         batcher.begin(mMenuCamera);
         batcher.setCamera(mMenuCamera);
-        batcher.render(mEarth, environment);
+        batcher.render(mEarth.getModel(), environment);
+        batcher.render(mSattelite.getModel(), environment);
         batcher.end();
 
         mGame.getSpriteBatcher().enableBlending();
         mGame.getSpriteBatcher().begin();
-        mGame.getSpriteBatcher().draw(Assets.logo, (Gdx.graphics.getWidth()/2 - Assets.logo.getRegionWidth()/2), Gdx.graphics.getHeight() - 100);
+        mGame.getSpriteBatcher().draw(Assets.getLogo(), (Gdx.graphics.getWidth()/2 -Assets.getLogo().getRegionWidth()/2), Gdx.graphics.getHeight() - 100);
         mGame.getSpriteBatcher().end();
     }
 
@@ -91,11 +91,4 @@ public class MainMenu extends ScreenAdapter {
         update(delta);
         draw();
     }
-
-    @Override
-    public void dispose () {
-        mEarthModel.dispose();
-    }
-
-
 }
