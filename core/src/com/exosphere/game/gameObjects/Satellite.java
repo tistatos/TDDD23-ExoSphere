@@ -1,6 +1,5 @@
 package com.exosphere.game.gameObjects;
 
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.exosphere.game.Assets;
 import com.exosphere.game.astroPhysics.Celestial;
@@ -15,6 +14,11 @@ public class Satellite extends Orbit implements IRenderable {
 
     public ModelInstance getModel() {
         return mModel;
+    }
+
+    @Override
+    public void update(float delta) {
+
     }
 
     public Satellite(double semiMajorAxis, double inclination, Celestial mOrbitedBody) {

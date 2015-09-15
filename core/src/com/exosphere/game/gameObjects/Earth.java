@@ -1,7 +1,8 @@
 package com.exosphere.game.gameObjects;
 
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import com.exosphere.game.Assets;
 import com.exosphere.game.astroPhysics.Celestial;
 
@@ -22,5 +23,11 @@ public class Earth extends Celestial implements IRenderable {
     @Override
     public ModelInstance getModel() {
         return mModel;
+    }
+
+    @Override
+    public void update(float delta) {
+        mModel.transform.rotateRad(Vector3.Y, delta * MathUtils.PI/12);
+
     }
 }

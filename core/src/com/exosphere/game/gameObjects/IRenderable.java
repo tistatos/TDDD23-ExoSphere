@@ -9,4 +9,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
  */
 public interface IRenderable {
     ModelInstance getModel();
+
+    void update(float delta);
 }

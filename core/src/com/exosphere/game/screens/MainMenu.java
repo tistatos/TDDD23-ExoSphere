@@ -3,19 +3,16 @@ package com.exosphere.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.exosphere.game.Assets;
-import com.exosphere.game.astroPhysics.SphericalCoord;
 import com.exosphere.game.Exosphere;
 import com.exosphere.game.gameObjects.Earth;
 import com.exosphere.game.gameObjects.Satellite;
@@ -48,12 +45,12 @@ public class MainMenu extends ScreenAdapter {
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         mEarth = new Earth();
-        mSattelite = new Satellite(1,1, mEarth);
+        mSattelite = new Satellite(.2,0, mEarth);
 
-        mMenuCamera.position.set(0f, 0f, 20f);
+        mMenuCamera.position.set(0f, 0f, 8000f);
         mMenuCamera.lookAt(0, 0, 0);
         mMenuCamera.near = 0.1f;
-        mMenuCamera.far = 300f;
+        mMenuCamera.far = 30000f;
     }
 
     public void update(float delta) {
@@ -65,7 +62,7 @@ public class MainMenu extends ScreenAdapter {
         }
 
         mMenuCamera.update();
-        mEarth.getModel().transform.rotateRad(Vector3.Y, delta * MathUtils.PI/12);
+        mEarth.update(delta);
     }
 
 

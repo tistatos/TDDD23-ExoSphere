@@ -45,10 +45,10 @@ public class Assets {
         mModelLoader = new ObjLoader();
         mMenuTexture = loadTexture("menu/menuTexture.png");
         mLogo = new TextureRegion(mMenuTexture, 0, 0, 252, 73);
-        mSatelliteModel = new ModelBuilder().createBox(0.3f,0.3f,0.3f, new Material(ColorAttribute.createDiffuse(Color.RED)),
+        mSatelliteModel = new ModelBuilder().createBox(30f,30f,30f, new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 
-        mEarthModel = new ModelBuilder().createSphere(10, 10, 10, 32, 32, new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+        mEarthModel = new ModelBuilder().createSphere(6371f, 6371f, 6371f, 36, 36, new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
     }
 
