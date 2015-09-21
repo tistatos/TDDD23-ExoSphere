@@ -30,7 +30,7 @@ public class Celestial {
     }
 
     public double getGravityAcc() {
-        return (Constants.GRAVITY_CONSTANT * mMass)/(mRadius*mRadius);
+        return (Constants.GRAVITY_CONSTANT * mMass)/((mRadius*1000)*(mRadius*1000));
     }
 
     public double getMu() {

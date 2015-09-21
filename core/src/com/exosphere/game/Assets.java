@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
@@ -21,6 +22,7 @@ public class Assets {
     static ModelLoader mModelLoader;
 
     static Texture mMenuTexture;
+    static Texture mEarthTexture;
     static TextureRegion mLogo;
     static Model mSatelliteModel;
     static Model mEarthModel;
@@ -44,12 +46,15 @@ public class Assets {
     public static void load() {
         mModelLoader = new ObjLoader();
         mMenuTexture = loadTexture("menu/menuTexture.png");
+        mEarthTexture = loadTexture("earth.jpg");
         mLogo = new TextureRegion(mMenuTexture, 0, 0, 252, 73);
-        mSatelliteModel = new ModelBuilder().createBox(30f,30f,30f, new Material(ColorAttribute.createDiffuse(Color.RED)),
+
+
+        mSatelliteModel = new ModelBuilder().createBox(600f,600f,600f, new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 
-        mEarthModel = new ModelBuilder().createSphere(6371f, 6371f, 6371f, 36, 36, new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        mEarthModel = new ModelBuilder().createSphere(6371f, 6371f, 6371f, 36, 36, new Material(TextureAttribute.createDiffuse(mEarthTexture)),//ColorAttribute.createDiffuse(Color.GREEN)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
     }
 
     //TODO: load OBJ-file method

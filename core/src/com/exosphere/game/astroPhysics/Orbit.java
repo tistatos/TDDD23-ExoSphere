@@ -1,6 +1,13 @@
 package com.exosphere.game.astroPhysics;
 
-import static java.lang.Math.sqrt;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.exosphere.game.Settings;
+
+import java.awt.*;
+
+import static java.lang.Math.*;
 
 /**
  * exosphere - Orbit
@@ -9,12 +16,20 @@ import static java.lang.Math.sqrt;
 public class Orbit {
     double mSemiMajorAxis; //a
     double mInclination;
-    double mEccentricity; //e
+    double mEccentricity = 0; //e
     Celestial mOrbitedBody;
 
-    public Orbit(double semiMajorAxis, double inclination, Celestial mOrbitedBody) {
-        mSemiMajorAxis = semiMajorAxis;
+    double mCurrentDistance;
+    double mCurrentAngle = 0.0f;
+
+    double mAnomalyOffset = 0.0f;
+    double mTrueAnomaly;
+
+    public Orbit(double semiMajorAxis, double inclination, Celestial orbitedBody) {
+        mSemiMajorAxis = semiMajorAxis*1000;
         mInclination = inclination;
+        mCurrentDistance = mSemiMajorAxis;
+        mOrbitedBody = orbitedBody;
     }
 
     public Orbit(double semiMajorAxis, double inclination, double eccentricity, Celestial mOrbitedBody) {
@@ -22,9 +37,91 @@ public class Orbit {
         this.mEccentricity = eccentricity;
     }
 
-    //FIXME: only valid for ciruclar motion i.e. e=0. the velocity is not constant for
-    public double orbitVelocity() {
-        return sqrt(mOrbitedBody.getMu()/mSemiMajorAxis);
+    public Orbit(double semiMajorAxis, double inclination, double eccentricity, double anomalyOffset, Celestial mOrbitedBody) {
+        this(semiMajorAxis, inclination, mOrbitedBody);
+        this.mAnomalyOffset = anomalyOffset;
+        this.mEccentricity = eccentricity;
+    }
+    /********************************************
+     * 4.38 AND 4.39 ARE ONLY FOR CIRCULAR ORBIT
+    *********************************************/
+    //4.38
+    private double meanAnomaly(double time) {
+        double n = meanMotion();
+        return n*time; // M
     }
 
+    //4.39 mean motion: n
+    private double meanMotion() {
+        return sqrt(mOrbitedBody.getMu() / (pow(mSemiMajorAxis, 3)));
+    }
+
+    //4.40 eccentricic anomaly E given M
+//    private double eccentricAnomaly(double M) {
+//        double e = mEccentricity;
+//        return 0.0;
+//    }
+
+    //4.41
+//    private double MeanAnomaly() {
+//        double E = eccentricAnomaly();
+//        double e = mEccentricity;
+//        return E-e*sin(E);
+//    }
+
+    //4.42
+    private double calcTrueAnomaly(double M) {
+        double e = mEccentricity;
+
+        return M+2*e*sin(M)+1.25*e*e*sin(2*M); //Low accuracy
+        //High accuracy need implementation of newton kepler via eccentricAnomaly
+    }
+
+    //4.43
+    private double getRadius(double v) {
+        double a = mSemiMajorAxis;
+        double e = mEccentricity;
+        return (a*(1-e*e)) / (1+e*cos(v));
+    }
+
+    //4.44
+    private double getFlightPathAngle(double v) {
+        double e = mEccentricity;
+        return atan(e*sin(v)/(1+e*cos(v)));
+    }
+
+    public void updateOrbit(double delta) {
+        double M = meanAnomaly(delta * Settings.getTimeFactor());
+        mTrueAnomaly += calcTrueAnomaly(M);
+
+        mCurrentDistance = getRadius(mTrueAnomaly);
+        mCurrentAngle = getFlightPathAngle(mTrueAnomaly);
+    }
+
+
+    public double getCurrentAnomaly() {
+        return mTrueAnomaly+mAnomalyOffset;
+    }
+    public double getCurrentRadius() {
+        return mCurrentDistance/1000.0f;
+    }
+
+
+    public Array<Vector3> getOrbit() {
+        Array<Vector3> points = new Array<>();
+        int numberOfPoints = 64;
+        double currentAngle = 0;
+        for(int i = 0; i < numberOfPoints; i++) {
+            double distance = getRadius(currentAngle);
+            double anomaly = currentAngle+mAnomalyOffset;
+            distance /= 1000;
+
+            float x = (float)(distance*cos(anomaly));
+            float z = (float)(distance*sin(-anomaly));
+            points.add(new Vector3(x, 0, z));
+            currentAngle += 2*PI/numberOfPoints;
+        }
+
+        return points;
+    }
 }
