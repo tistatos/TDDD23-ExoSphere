@@ -1,9 +1,9 @@
 package com.exosphere.game.astroPhysics;
 
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.exosphere.game.Settings;
+
 
 import java.awt.*;
 
@@ -15,7 +15,7 @@ import static java.lang.Math.*;
  */
 public class Orbit {
     double mSemiMajorAxis; //a
-    double mInclination;
+    protected double mInclination;
     double mEccentricity = 0; //e
     Celestial mOrbitedBody;
 
@@ -24,6 +24,7 @@ public class Orbit {
 
     double mAnomalyOffset = 0.0f;
     double mTrueAnomaly;
+
 
     public Orbit(double semiMajorAxis, double inclination, Celestial orbitedBody) {
         mSemiMajorAxis = semiMajorAxis*1000;
@@ -48,6 +49,7 @@ public class Orbit {
     //4.38
     private double meanAnomaly(double time) {
         double n = meanMotion();
+        n = getVehicleVelocity()/mCurrentDistance;
         return n*time; // M
     }
 
@@ -99,13 +101,38 @@ public class Orbit {
     }
 
 
+    //4.45
+    public double getVehicleVelocity() {
+        return sqrt(mOrbitedBody.getMu()*(2/mCurrentDistance - 1/mSemiMajorAxis));
+    }
+
+
+    private double getInclination(double anomaly) {
+        return getCurrentRadius()*sin(mInclination)*cos(anomaly+mAnomalyOffset);
+
+    }
+
     public double getCurrentAnomaly() {
         return mTrueAnomaly+mAnomalyOffset;
+    }
+    public double getCurrentInclination() {
+        return getInclination(mTrueAnomaly);
+    }
+    public double getSemiMajorAxis() {
+        return mSemiMajorAxis;
+    }
+    public void setSemiMajorAxis(double axis) {
+        mSemiMajorAxis = axis;
+    }
+    public double getInclination() {
+        return mInclination;
+    }
+    public void setInclination(double v) {
+        mInclination = v;
     }
     public double getCurrentRadius() {
         return mCurrentDistance/1000.0f;
     }
-
 
     public Array<Vector3> getOrbit() {
         Array<Vector3> points = new Array<>();
@@ -117,11 +144,19 @@ public class Orbit {
             distance /= 1000;
 
             float x = (float)(distance*cos(anomaly));
+            float y = 0;
             float z = (float)(distance*sin(-anomaly));
-            points.add(new Vector3(x, 0, z));
+            Vector3 point = new Vector3(x,y,z);
+            point.rotate(Vector3.Z, (float)mInclination);
+
+            points.add(point);
             currentAngle += 2*PI/numberOfPoints;
         }
 
         return points;
+    }
+
+    public SphericalCoord getCoordinates() {
+        return new SphericalCoord((float)getCurrentRadius(), (float)getCurrentAnomaly(), 0);
     }
 }

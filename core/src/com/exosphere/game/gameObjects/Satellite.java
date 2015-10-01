@@ -1,17 +1,14 @@
 package com.exosphere.game.gameObjects;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.exosphere.game.Assets;
 import com.exosphere.game.astroPhysics.Celestial;
 import com.exosphere.game.astroPhysics.Orbit;
-import com.intellij.openapi.graph.layout.tree.AbstractRotatableNodePlacer;
+import com.exosphere.game.astroPhysics.SphericalCoord;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 
 /**
  * exosphere - Satellite
@@ -28,9 +25,19 @@ public class Satellite extends Orbit implements IRenderable {
     public void update(float delta) {
 
         updateOrbit(delta);
-        double x = getCurrentRadius()*cos(getCurrentAnomaly());
-        double z = getCurrentRadius()*sin(-getCurrentAnomaly());
-        mModel.transform.setTranslation((float)x, 0.0f, (float)z);
+
+        Array<Vector3> orbit = getOrbit();
+        SphericalCoord pos = getCoordinates();
+        mModel.transform.setToScaling(10000, 10000, 10000);
+        mModel.transform.setTranslation(pos.toCartesian());
+        mModel.transform.translate(pos.toCartesian().scl(-1));
+        mModel.transform.setToRotationRad(Vector3.Z, (float) mInclination);
+        mModel.transform.translate(pos.toCartesian());
+    }
+
+    @Override
+    public void draw() {
+
     }
 
     public Satellite(double semiMajorAxis, double inclination, Celestial orbitedBody) {
@@ -42,6 +49,7 @@ public class Satellite extends Orbit implements IRenderable {
     }
     public Satellite(double semiMajorAxis, double inclination, double eccentricity, double anomalyOffset, Celestial orbitedBody) {
         super(semiMajorAxis, inclination, eccentricity, anomalyOffset, orbitedBody);
+
         mModel = new ModelInstance(Assets.getSatelliteModel());
     }
 }

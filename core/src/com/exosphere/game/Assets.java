@@ -1,6 +1,7 @@
 package com.exosphere.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,6 +27,7 @@ public class Assets {
     static TextureRegion mLogo;
     static Model mSatelliteModel;
     static Model mEarthModel;
+    private static AssetManager assets;
 
 
     public static Model getEarthModel() {
@@ -49,10 +51,16 @@ public class Assets {
         mEarthTexture = loadTexture("earth.jpg");
         mLogo = new TextureRegion(mMenuTexture, 0, 0, 252, 73);
 
-
-        mSatelliteModel = new ModelBuilder().createBox(600f,600f,600f, new Material(ColorAttribute.createDiffuse(Color.RED)),
+        mSatelliteModel = new ModelBuilder().createBox(600f, 600f, 600f, new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 
+//        assets = new AssetManager();
+//        assets.load("box.obj", Model.class);
+//
+//        assets.update();
+//        assets.finishLoading();
+//        mSatelliteModel = loadModel("box.obj");
+//        mSatelliteModel.materials.add(new Material(ColorAttribute.createDiffuse(Color.RED)));
         mEarthModel = new ModelBuilder().createSphere(6371f, 6371f, 6371f, 36, 36, new Material(TextureAttribute.createDiffuse(mEarthTexture)),//ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
     }

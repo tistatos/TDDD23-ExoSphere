@@ -28,8 +28,8 @@ public class SphericalCoord {
 
     public SphericalCoord(float r, float theta, float phi) {
         mRadius = r;
-        mTheta = theta % MathUtils.PI2;
-        mPhi = phi % MathUtils.PI;
+        mTheta = theta;
+        mPhi = phi;
     }
 
     public SphericalCoord(SphericalCoord sc) {
@@ -41,11 +41,11 @@ public class SphericalCoord {
     }
 
     public void setTheta(float theta) {
-        this.mTheta = theta % MathUtils.PI;
+        this.mTheta = theta;/*% MathUtils.PI2;*/
     }
 
     public void setPhi(float phi) {
-        this.mPhi = phi % MathUtils.PI2;
+        this.mPhi = phi; /*% MathUtils.PI2;*/
     }
 
     public float getRadius() {
@@ -61,9 +61,9 @@ public class SphericalCoord {
     }
 
     public Vector3 toCartesian() {
-        float x = mRadius*sin(mTheta)*cos(mPhi);
+        float x = mRadius*cos(mTheta)*cos(mPhi);
         float y = mRadius*sin(mPhi);
-        float z = mRadius*sin(mTheta)*sin(mPhi);
+        float z = mRadius*sin(-mTheta);
 
         return new Vector3(x, y, z);
     }

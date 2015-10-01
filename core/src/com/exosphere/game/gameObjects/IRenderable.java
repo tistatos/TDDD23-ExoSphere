@@ -10,4 +10,6 @@ public interface IRenderable {
     ModelInstance getModel();
 
     void update(float delta);
+
+    void draw();
 }
