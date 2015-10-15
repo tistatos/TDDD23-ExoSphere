@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
+import org.apache.velocity.runtime.VelocimacroFactory;
+
+import static java.lang.StrictMath.abs;
 
 /**
  * exosphere - PlayerCamera
@@ -17,11 +20,10 @@ public class PlayerCamera {
     PerspectiveCamera mCamera;
     boolean mMovable;
     boolean mMoving;
-    boolean mRightClicked;
 
     float veloX = 0.0f;
     float veloY = 0.0f;
-
+    float moveSpeed = 1.0f;
     public PerspectiveCamera getCamera() {
         return mCamera;
     }
@@ -36,8 +38,30 @@ public class PlayerCamera {
     }
 
 
+    public Vector3 getPlaneIntersectionPoint() {
+        float mouseX = Gdx.input.getX();
+        float mouseY = Gdx.input.getY();
+        return getPlaneIntersectionPoint(mouseX, mouseY);
+    }
+
+    public Vector3 getPlaneIntersectionPoint(float x, float y) {
+        Plane p = new Plane(Vector3.Y, Vector3.Zero);
+        return getPlaneIntersectionPoint(p, x, y);
+    }
+
+    public Vector3 getPlaneIntersectionPoint(Plane p, float x, float y) {
+        Ray ray = mCamera.getPickRay(x, y);
+
+        Vector3 result = new Vector3(0,0,0);
+        Intersector.intersectRayPlane(ray, p, result);
+        return result;
+    }
+
+
     public void update(float delta) {
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) && mMovable) {
+        boolean leftMouse = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        boolean rightMouse = Gdx.input.isButtonPressed(Input.Buttons.RIGHT);
+        if(leftMouse && mMovable && !rightMouse) {
             if(!mMoving) {
                 veloX = 0;
                 veloY = 0;
@@ -45,39 +69,15 @@ public class PlayerCamera {
             float dx = Gdx.input.getDeltaX();
             float dy = Gdx.input.getDeltaY();
 
-            veloX += 1.5f*dx*delta;
-            veloY += 1.5f*dy*delta;
+            veloX += moveSpeed*dx*delta;
+            veloY += moveSpeed*dy*delta;
+
             mMoving = true;
         }
-        else {
-            mMoving = false;
-            veloX *= 0.98f;
-            veloY *= 0.98f;
-        }
 
-
-        if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-            if(!mRightClicked) {
-                mRightClicked = true;
-                float mouseX = Gdx.input.getX()/mCamera.viewportWidth;
-                float mouseY = Gdx.input.getY()/mCamera.viewportHeight;
-                Ray ray = mCamera.getPickRay(mouseX, mouseY);
-
-                veloX = 0f;
-                veloY = 0f;
-                Plane p = new Plane(Vector3.Z, Vector3.Zero);
-                Vector3 intersection = Vector3.Zero;
-                if(Intersector.intersectRayPlane(ray, p, intersection)) {
-                    System.out.println("Spawn satellite at " + intersection);
-                }
-            }
-            else {
-
-            }
-        }
-        else {
-            mRightClicked = false;
-
+        if(rightMouse) {
+            veloX = 0;
+            veloY = 0;
         }
 
         mCamera.rotateAround(Vector3.Zero, Vector3.Y, -veloX);
@@ -98,7 +98,22 @@ public class PlayerCamera {
             veloY = 0.0f;
         }
         mCamera.lookAt(0, 0, 0);
-
         mCamera.update();
+
+        veloX *= 0.98f;
+        veloY *= 0.98f;
+
+
+        if(abs(veloX) < 0.2f)
+            veloX = 0;
+        if(abs(veloY) < 0.2f)
+            veloY = 0;
+    }
+
+    public Ray getPickingRay() {
+        float x = Gdx.input.getX();
+        float y = Gdx.input.getY();
+        return mCamera.getPickRay(x, y);
+
     }
 }

@@ -4,25 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.VertexArray;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.exosphere.game.Assets;
 import com.exosphere.game.Exosphere;
-import com.exosphere.game.Settings;
+import com.exosphere.game.astroPhysics.Orbit;
 import com.exosphere.game.gameObjects.Earth;
 import com.exosphere.game.gameObjects.PlayerCamera;
 import com.exosphere.game.gameObjects.Satellite;
-
-import java.awt.*;
+import com.exosphere.game.gameObjects.SatelliteContainer;
+import com.exosphere.game.states.LevelState;
 
 /**
  * exosphere - MainMenu
@@ -35,131 +31,115 @@ public class MainMenu extends ScreenAdapter {
     PlayerCamera mMenuCamera;
     Rectangle mExitBounds;
     Rectangle mPlayBounds;
-    Rectangle mSettings;
 
     Earth mEarth;
     Satellite mSatellite;
     Satellite mSecondSatellite;
     Satellite mThirdSatellite;
 
+
+    SatelliteContainer mSatelliteContainer;
     Environment environment;
-    ShapeRenderer shapeDebugger;
+    ShapeRenderer shapeRender;
     Vector3 satPos;
+
     public MainMenu(Exosphere game) {
         this.mGame = game;
-        mMenuCamera = new PlayerCamera(new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), !false);
+        mMenuCamera = new PlayerCamera(new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), false);
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-
+        mSatelliteContainer = new SatelliteContainer();
         mEarth = new Earth();
-        mSatellite = new Satellite(18164.0f, Math.PI/4, 0, 0.6, mEarth);
-        mSecondSatellite = new Satellite(28164.0f, -Math.PI/6,0.0, mEarth);
-        mThirdSatellite = new Satellite(38164.0f, 0.0, 0.8, mEarth);
+        mSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,2*Math.PI/3, mEarth));
+        mSecondSatellite = new Satellite(new Orbit(98164.0f, 0,0.7,4*Math.PI/3, mEarth));
+        mThirdSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,0, mEarth));
 
+        mSatelliteContainer.add(mSatellite);
+        mSatelliteContainer.add(mSecondSatellite);
+        mSatelliteContainer.add(mThirdSatellite);
 
-        mMenuCamera.getCamera().position.set(0f, 30000f, 64000f );
+        mPlayBounds = new Rectangle(477,465,323, 82);
+        mExitBounds = new Rectangle(477,615,323, 82);
+
+        mMenuCamera.getCamera().position.set(0f, 80000f, 194000f );
         mMenuCamera.getCamera().near = 0.1f;
         mMenuCamera.getCamera().far = 600000f;
 
-        shapeDebugger = new ShapeRenderer();
+        shapeRender = new ShapeRenderer();
         satPos = new Vector3();
     }
 
     public void update(float delta) {
 
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            if(mPlayBounds.contains(Gdx.input.getX(),Gdx.input.getY())) {
+                mGame.setScreen(new GameScreen(mGame, new LevelState()));
+            }
+            if(mExitBounds.contains(Gdx.input.getX(), Gdx.input.getY())) {
+                Gdx.app.exit();
+            }
+        }
+
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            Settings.setTimeFactor(60*200);
-        }
-        else {
-            Settings.setTimeFactor(60 * 10);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            Settings.setTimeFactor(0);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.I)) {
-            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis() + 50000.0f);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.K)) {
-            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis()-50000.0f);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.O)) {
-            mThirdSatellite.setInclination(mThirdSatellite.getInclination() + Math.PI /128.0f);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.L)) {
-            mThirdSatellite.setInclination(mThirdSatellite.getInclination() - Math.PI/128.0f);
-        }
+
+//        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+//            Settings.setTimeFactor(60*200);
+//        }
+//        else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+//            Settings.setTimeFactor(0);
+//        }
+//        else {
+//            Settings.setTimeFactor(60 * 10);
+//        }
+//
+//        if(Gdx.input.isKeyPressed(Input.Keys.I)) {
+//            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis() + 50000.0f);
+//        }
+//        if(Gdx.input.isKeyPressed(Input.Keys.K)) {
+//            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis()-50000.0f);
+//        }
+//        if(Gdx.input.isKeyPressed(Input.Keys.O)) {
+//            mThirdSatellite.setInclination(mThirdSatellite.getInclination() + Math.PI /128.0f);
+//        }
+//        if(Gdx.input.isKeyPressed(Input.Keys.L)) {
+//            mThirdSatellite.setInclination(mThirdSatellite.getInclination() - Math.PI/128.0f);
+//        }
 
         mMenuCamera.update(delta);
         mEarth.update(delta);
-        mSatellite.update(delta);
-        mSecondSatellite.update(delta);
-        mThirdSatellite.update(delta);
+        mSatelliteContainer.update(delta);
     }
 
 
     public void draw() {
 
         ModelBatch batcher = mGame.getBatcher();
+
         Gdx.gl20.glClearColor(0, 0, 0, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Assets.getCubeMap().render(mMenuCamera.getCamera());
 
-        shapeDebugger.setProjectionMatrix(mMenuCamera.getCamera().combined);
-        shapeDebugger.begin(ShapeRenderer.ShapeType.Filled);
-        shapeDebugger.setColor(1, 1, 1, 1);
-
-        mSatellite.getModel().transform.getTranslation(satPos);
-        Array<Vector3> pts = mSatellite.getOrbit();
-        for(int i = 0; i < pts.size; i++) {
-            Vector3 first = pts.get(i);
-            Vector3 second = pts.get((i+1)%pts.size);
-            shapeDebugger.identity();
-            shapeDebugger.rotate(0, 0, 1, (float) (mSatellite.getInclination() * 180 / Math.PI));
-            shapeDebugger.rotate(1, 0, 0, 90.0f);
-            shapeDebugger.rectLine(first.x, first.z, second.x, second.z, 500.0f);
-        }
-        pts = mSecondSatellite.getOrbit();
-        for(int i = 0; i < pts.size; i++) {
-            Vector3 first = pts.get(i);
-            Vector3 second = pts.get((i+1) % pts.size);
-            shapeDebugger.identity();
-            shapeDebugger.rotate(0, 0, 1, (float) (mSecondSatellite.getInclination() * 180 / Math.PI));
-            shapeDebugger.rotate(1, 0, 0, 90.0f);
-            shapeDebugger.rectLine(first.x, first.z, second.x, second.z, 500.0f);
-        }
-        pts = mThirdSatellite.getOrbit();
-        for(int i = 0; i < pts.size; i++) {
-            Vector3 first = pts.get(i);
-            Vector3 second = pts.get((i+1)%pts.size);
-            shapeDebugger.identity();
-            shapeDebugger.rotate(1, 0, 0, 90.0f);
-            shapeDebugger.rotate(0, 0, 0, (float) (mThirdSatellite.getInclination() * 180 / Math.PI));
-            shapeDebugger.rectLine(first.x, first.z, second.x, second.z, 500.0f);
-        }
-
-        shapeDebugger.identity();
-        shapeDebugger.line(Vector3.Zero, satPos);
-        mSecondSatellite.getModel().transform.getTranslation(satPos);
-        shapeDebugger.line(0, 0, 0, satPos.x, satPos.y, satPos.z);
-        mThirdSatellite.getModel().transform.getTranslation(satPos);
-        shapeDebugger.line(0, 0, 0, satPos.x, satPos.y, satPos.z);
-        shapeDebugger.end();
+        shapeRender.setProjectionMatrix(mMenuCamera.getCamera().combined);
+        shapeRender.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRender.setColor(1, 1, 1, 1);
+        mSatelliteContainer.drawOrbits(shapeRender);
+        shapeRender.end();
 
         batcher.begin(mMenuCamera.getCamera());
         batcher.setCamera(mMenuCamera.getCamera());
         batcher.render(mEarth.getModel(), environment);
-        batcher.render(mSatellite.getModel(), environment);
-        batcher.render(mSecondSatellite.getModel(), environment);
-        batcher.render(mThirdSatellite.getModel(), environment);
+        batcher.render(mSatelliteContainer, environment);
         batcher.end();
 
         mGame.getSpriteBatcher().enableBlending();
         mGame.getSpriteBatcher().begin();
-        mGame.getSpriteBatcher().draw(Assets.getLogo(), (Gdx.graphics.getWidth()/2 -Assets.getLogo().getRegionWidth()/2), Gdx.graphics.getHeight() - 100);
+        mGame.getSpriteBatcher().draw(Assets.getLogo(), (Gdx.graphics.getWidth() / 2 - Assets.getLogo().getRegionWidth() / 2), Gdx.graphics.getHeight() - 350);
+        mGame.getSpriteBatcher().draw(Assets.getStart(), (Gdx.graphics.getWidth()/2 -Assets.getStart().getRegionWidth()/2), Gdx.graphics.getHeight() - 550);
+        mGame.getSpriteBatcher().draw(Assets.getExit(), (Gdx.graphics.getWidth()/2 -Assets.getExit().getRegionWidth()/2), Gdx.graphics.getHeight() - 700);
         mGame.getSpriteBatcher().end();
     }
 

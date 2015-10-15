@@ -5,8 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import com.exosphere.game.Settings;
 
 
-import java.awt.*;
-
 import static java.lang.Math.*;
 
 /**
@@ -17,13 +15,13 @@ public class Orbit {
     double mSemiMajorAxis; //a
     protected double mInclination;
     double mEccentricity = 0; //e
-    Celestial mOrbitedBody;
+    protected Celestial mOrbitedBody;
 
     double mCurrentDistance;
     double mCurrentAngle = 0.0f;
 
-    double mAnomalyOffset = 0.0f;
-    double mTrueAnomaly;
+    double mOrbitOffset = 0.0f;
+    double mTrueAnomaly = 0.0f;
 
 
     public Orbit(double semiMajorAxis, double inclination, Celestial orbitedBody) {
@@ -38,14 +36,19 @@ public class Orbit {
         this.mEccentricity = eccentricity;
     }
 
-    public Orbit(double semiMajorAxis, double inclination, double eccentricity, double anomalyOffset, Celestial mOrbitedBody) {
+    public Orbit(double semiMajorAxis, double inclination, double eccentricity, double orbitOffset, Celestial mOrbitedBody) {
         this(semiMajorAxis, inclination, mOrbitedBody);
-        this.mAnomalyOffset = anomalyOffset;
+        this.mOrbitOffset = orbitOffset;
         this.mEccentricity = eccentricity;
     }
-    /********************************************
-     * 4.38 AND 4.39 ARE ONLY FOR CIRCULAR ORBIT
-    *********************************************/
+
+    public Orbit(double semiMajorAxis, double inclination, double eccentricity, double startingAnomaly, double orbitOffset, Celestial mOrbitedBody) {
+        this(semiMajorAxis, inclination, eccentricity, orbitOffset, mOrbitedBody);
+        mTrueAnomaly = startingAnomaly;
+    }
+        /********************************************
+         * 4.38 AND 4.39 ARE ONLY FOR CIRCULAR ORBIT
+        *********************************************/
     //4.38
     private double meanAnomaly(double time) {
         double n = meanMotion();
@@ -58,11 +61,12 @@ public class Orbit {
         return sqrt(mOrbitedBody.getMu() / (pow(mSemiMajorAxis, 3)));
     }
 
+
     //4.40 eccentricic anomaly E given M
-//    private double eccentricAnomaly(double M) {
-//        double e = mEccentricity;
-//        return 0.0;
-//    }
+    private double eccentricAnomaly(double M) {
+        double e = mEccentricity;
+        return 0.0;
+    }
 
     //4.41
 //    private double MeanAnomaly() {
@@ -108,25 +112,23 @@ public class Orbit {
 
 
     private double getInclination(double anomaly) {
-        return getCurrentRadius()*sin(mInclination)*cos(anomaly+mAnomalyOffset);
-
+        return getCurrentRadius()*sin(mInclination)*cos(anomaly+mOrbitOffset);
     }
 
     public double getCurrentAnomaly() {
-        return mTrueAnomaly+mAnomalyOffset;
+        return mTrueAnomaly+mOrbitOffset;
     }
-    public double getCurrentInclination() {
-        return getInclination(mTrueAnomaly);
-    }
+
     public double getSemiMajorAxis() {
         return mSemiMajorAxis;
     }
     public void setSemiMajorAxis(double axis) {
-        mSemiMajorAxis = axis;
+        mSemiMajorAxis = axis*1000;
     }
     public double getInclination() {
         return mInclination;
     }
+
     public void setInclination(double v) {
         mInclination = v;
     }
@@ -134,13 +136,17 @@ public class Orbit {
         return mCurrentDistance/1000.0f;
     }
 
-    public Array<Vector3> getOrbit() {
+    public void addToAnomaly(double addition) {
+        mTrueAnomaly += addition;
+    }
+
+    public Array<Vector3> getPointsOrbit() {
         Array<Vector3> points = new Array<>();
-        int numberOfPoints = 64;
+        int numberOfPoints = 128;
         double currentAngle = 0;
         for(int i = 0; i < numberOfPoints; i++) {
             double distance = getRadius(currentAngle);
-            double anomaly = currentAngle+mAnomalyOffset;
+            double anomaly = currentAngle+mOrbitOffset;
             distance /= 1000;
 
             float x = (float)(distance*cos(anomaly));
@@ -158,5 +164,9 @@ public class Orbit {
 
     public SphericalCoord getCoordinates() {
         return new SphericalCoord((float)getCurrentRadius(), (float)getCurrentAnomaly(), 0);
+    }
+
+    public Celestial getCelestial() {
+        return mOrbitedBody;
     }
 }
