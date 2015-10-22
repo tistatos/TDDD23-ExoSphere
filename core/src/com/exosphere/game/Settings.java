@@ -15,7 +15,8 @@ public class Settings {
     static String msSettingsFile = "exosphere.settings";
 
     //1 = time factor
-    static double msTimeFactor = 60*10;
+    static double msTimeFactor = 60*100;
+    public static double Scale = 10000;
 
     public static void load() {
         try {

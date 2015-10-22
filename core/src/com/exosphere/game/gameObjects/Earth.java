@@ -11,12 +11,14 @@ import com.exosphere.game.astroPhysics.Celestial;
  * Created by tistatos on 9/14/15.
  */
 public class Earth extends Celestial implements IRenderable {
-    private static final double mEarthMass = 5.97237e24;
-    private static final double mEarthRadius = 6371;
-    private static final double mEarthRotationSpeed = 7.2921150e-5;
+    public static final double mEarthMass = 5.97237e24;
+    public static final double mEarthRadius = 6371;
+    public static final double mEarthRotationSpeed = 7.2921150e-5;
+
     private ModelInstance mModel;
+
     public Earth() {
-        super(mEarthMass, mEarthRadius);
+        super(mEarthMass, mEarthRadius, mEarthRotationSpeed);
 
         mModel = new ModelInstance(Assets.getEarthModel());
     }
@@ -28,8 +30,8 @@ public class Earth extends Celestial implements IRenderable {
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         mModel.transform.rotateRad(Vector3.Y, (float)(delta * Settings.getTimeFactor() * mEarthRotationSpeed));
-
     }
 
     @Override

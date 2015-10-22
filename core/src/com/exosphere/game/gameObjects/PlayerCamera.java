@@ -2,11 +2,13 @@ package com.exosphere.game.gameObjects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
+import com.exosphere.game.astroPhysics.SphericalCoord;
 import org.apache.velocity.runtime.VelocimacroFactory;
 
 import static java.lang.StrictMath.abs;
@@ -15,7 +17,7 @@ import static java.lang.StrictMath.abs;
  * exosphere - PlayerCamera
  * Created by tistatos on 9/29/15.
  */
-public class PlayerCamera {
+public class PlayerCamera implements InputProcessor{
 
     PerspectiveCamera mCamera;
     boolean mMovable;
@@ -57,6 +59,10 @@ public class PlayerCamera {
         return result;
     }
 
+    public void stopCameraMovement() {
+        veloX = 0;
+        veloY = 0;
+    }
 
     public void update(float delta) {
         boolean leftMouse = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
@@ -115,5 +121,47 @@ public class PlayerCamera {
         float y = Gdx.input.getY();
         return mCamera.getPickRay(x, y);
 
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        Vector3 dir = mCamera.position.cpy().nor();
+        mCamera.translate(dir.scl(amount*600));
+        return false;
     }
 }

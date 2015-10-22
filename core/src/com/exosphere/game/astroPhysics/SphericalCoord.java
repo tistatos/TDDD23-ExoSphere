@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.Vector3;
 import static com.badlogic.gdx.math.MathUtils.atan2;
 import static com.badlogic.gdx.math.MathUtils.cos;
 import static com.badlogic.gdx.math.MathUtils.sin;
-import static java.lang.Math.acos;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
+import static java.lang.StrictMath.asin;
 
 /**
  * exosphere - SphericalCoord
@@ -16,19 +16,20 @@ import static java.lang.Math.sqrt;
  */
 public class SphericalCoord {
 
-    float mRadius;
-    float mTheta;
-    float mPhi;
+    double mRadius;
+    double mTheta;
+    double mPhi;
 
     public SphericalCoord(Vector3 v) {
-        mRadius = (float)sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+        mRadius = sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
         mTheta = atan2(v.z, v.x);
-        mPhi = (float)acos(v.y/mRadius);
+        mTheta = (mTheta > 0 ? mTheta : (2*MathUtils.PI + mTheta));
+        mPhi = asin(v.y / mRadius);
     }
 
-    public SphericalCoord(float r, float theta, float phi) {
+    public SphericalCoord(double r, double theta, double phi) {
         mRadius = r;
-        mTheta = theta;
+        mTheta = (theta < MathUtils.PI2) ? theta : (theta-MathUtils.PI2) ;
         mPhi = phi;
     }
 
@@ -36,34 +37,34 @@ public class SphericalCoord {
         this(sc.getRadius(), sc.getTheta(), sc.getPhi());
     }
 
-    public void setRadius(float radius) {
+    public void setRadius(double radius) {
         mRadius = max(0,radius);
     }
 
-    public void setTheta(float theta) {
-        this.mTheta = theta;/*% MathUtils.PI2;*/
+    public void setTheta(double theta) {
+        this.mTheta = (theta < MathUtils.PI2) ? theta : (theta-MathUtils.PI2);
     }
 
     public void setPhi(float phi) {
         this.mPhi = phi; /*% MathUtils.PI2;*/
     }
 
-    public float getRadius() {
+    public double getRadius() {
         return mRadius;
     }
 
-    public float getTheta() {
+    public double getTheta() {
         return mTheta;
     }
 
-    public float getPhi() {
+    public double getPhi() {
         return mPhi;
     }
 
     public Vector3 toCartesian() {
-        float x = mRadius*cos(mTheta)*cos(mPhi);
-        float y = mRadius*sin(mPhi);
-        float z = mRadius*sin(-mTheta);
+        float x = (float)(mRadius*cos((float)mTheta)*cos((float)mPhi));
+        float y = (float)(mRadius*sin((float)mPhi));
+        float z = (float)(mRadius*sin(-(float)mTheta));
 
         return new Vector3(x, y, z);
     }

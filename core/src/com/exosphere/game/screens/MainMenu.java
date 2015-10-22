@@ -18,7 +18,6 @@ import com.exosphere.game.gameObjects.Earth;
 import com.exosphere.game.gameObjects.PlayerCamera;
 import com.exosphere.game.gameObjects.Satellite;
 import com.exosphere.game.gameObjects.SatelliteContainer;
-import com.exosphere.game.states.LevelState;
 
 /**
  * exosphere - MainMenu
@@ -52,18 +51,19 @@ public class MainMenu extends ScreenAdapter {
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
         mSatelliteContainer = new SatelliteContainer();
         mEarth = new Earth();
-        mSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,2*Math.PI/3, mEarth));
+
+        mSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,Math.PI/4,2*Math.PI/3, mEarth));
         mSecondSatellite = new Satellite(new Orbit(98164.0f, 0,0.7,4*Math.PI/3, mEarth));
-        mThirdSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,0, mEarth));
+        mThirdSatellite = new Satellite(new Orbit(98164.0f, 0, 0.7,3*Math.PI/4,0, mEarth));
 
         mSatelliteContainer.add(mSatellite);
         mSatelliteContainer.add(mSecondSatellite);
         mSatelliteContainer.add(mThirdSatellite);
 
-        mPlayBounds = new Rectangle(477,465,323, 82);
-        mExitBounds = new Rectangle(477,615,323, 82);
+        mPlayBounds = new Rectangle(677,465,323, 82);
+        mExitBounds = new Rectangle(677,615,323, 82);
 
-        mMenuCamera.getCamera().position.set(0f, 80000f, 194000f );
+        mMenuCamera.getCamera().position.set(0f, 8000f, 19400f );
         mMenuCamera.getCamera().near = 0.1f;
         mMenuCamera.getCamera().far = 600000f;
 
@@ -75,7 +75,7 @@ public class MainMenu extends ScreenAdapter {
 
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             if(mPlayBounds.contains(Gdx.input.getX(),Gdx.input.getY())) {
-                mGame.setScreen(new GameScreen(mGame, new LevelState()));
+                mGame.setScreen(new GameScreen(mGame));
             }
             if(mExitBounds.contains(Gdx.input.getX(), Gdx.input.getY())) {
                 Gdx.app.exit();
@@ -85,29 +85,6 @@ public class MainMenu extends ScreenAdapter {
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
-
-//        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-//            Settings.setTimeFactor(60*200);
-//        }
-//        else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-//            Settings.setTimeFactor(0);
-//        }
-//        else {
-//            Settings.setTimeFactor(60 * 10);
-//        }
-//
-//        if(Gdx.input.isKeyPressed(Input.Keys.I)) {
-//            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis() + 50000.0f);
-//        }
-//        if(Gdx.input.isKeyPressed(Input.Keys.K)) {
-//            mThirdSatellite.setSemiMajorAxis(mThirdSatellite.getSemiMajorAxis()-50000.0f);
-//        }
-//        if(Gdx.input.isKeyPressed(Input.Keys.O)) {
-//            mThirdSatellite.setInclination(mThirdSatellite.getInclination() + Math.PI /128.0f);
-//        }
-//        if(Gdx.input.isKeyPressed(Input.Keys.L)) {
-//            mThirdSatellite.setInclination(mThirdSatellite.getInclination() - Math.PI/128.0f);
-//        }
 
         mMenuCamera.update(delta);
         mEarth.update(delta);
